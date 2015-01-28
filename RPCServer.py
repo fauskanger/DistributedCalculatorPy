@@ -1,5 +1,7 @@
+from statistics import mean
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
+from PowRPCServer import  powerOf
 import xmlrpc.client
 
 # Restrict to a particular path.
@@ -11,24 +13,13 @@ server = SimpleXMLRPCServer(("localhost", 8000),
                             requestHandler=RequestHandler)
 server.register_introspection_functions()
 
-# TO-DO:
-# create PowRPCServer
-# create proxy for PowRPCServer
-
 # Register pow() function; this will use the value of
 # pow.__name__ as the name, which is just 'pow'.
-def power(x,y):
-    powServer = SimpleXMLRPCServer(("localhost", 8001), requestHandler=RequestHandler)
-    powServer.register_function(pow)
+#server.register_function(pow)
 
-    p = xmlrpc.client.ServerProxy('http://localhost:8000')
-    result = p.pow(x,y)
+s = xmlrpc.client.ServerProxy('http://localhost:8000')
 
-    powServer.server_close()
-
-    return result
-
-server.register_function(pow)
+#server.register_function(powerOf,'pow')
 
 # Register a function under a different name
 def adder_function(x,y):

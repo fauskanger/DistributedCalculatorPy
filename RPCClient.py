@@ -1,7 +1,7 @@
 import xmlrpc.client
 
 s = xmlrpc.client.ServerProxy('http://localhost:8000')
-print(s.pow(2,3))  # Returns 2**3 = 8
+#print(s.pow(2,3))  # Returns 2**3 = 8 Don't have a pow-method
 print(s.add(2,3))  # Returns 5
 print(s.mul(5,2))  # Returns 5*2 = 10
 

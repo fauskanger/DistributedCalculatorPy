@@ -23,15 +23,17 @@ s2 = ServerThread(8002)
 
 
 class S1Funcs:
-    def mul(x, y):
+
+    def mul(self, x, y):
         return x * y
-    def divide(x, y):
+
+    def divide(self, x, y):
         if y != 0:
             return x / y
         else:
             return ZeroDivisionError
 
-s1.localServer.register_instance(S1Funcs)
+s1.localServer.register_instance(S1Funcs())
 s1.start()
 
 s2.localServer.register_function(pow)
@@ -48,13 +50,13 @@ class MainFuncs:
     def sub(self, x, y):
         return x - y
 
-    # Passed on to S1
+    # Pass on to S1
     def divide(self, x, y):
         return c1.divide(x, y)
     def mul(self, x, y):
         return c1.mul(x, y)
 
-    # Passed on to S2
+    # Pass on to S2
     def pow(self, x, y):
         return c2.pow(x, y)
 

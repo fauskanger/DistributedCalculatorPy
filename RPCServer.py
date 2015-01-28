@@ -1,38 +1,63 @@
 from statistics import mean
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
-from PowRPCServer import  powerOf
+import threading
 import xmlrpc.client
 
-# Restrict to a particular path.
+
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
-# Create server
-server = SimpleXMLRPCServer(("localhost", 8000),
-                            requestHandler=RequestHandler)
-server.register_introspection_functions()
+class ServerThread(threading.Thread):
+    def __init__(self, port):
+        threading.Thread.__init__(self)
+        self.localServer = SimpleXMLRPCServer(("localhost", port), requestHandler=RequestHandler)
+        self.localServer.register_introspection_functions()
 
-# Register pow() function; this will use the value of
-# pow.__name__ as the name, which is just 'pow'.
-#server.register_function(pow)
+    def run(self):
+        self.localServer.serve_forever()
 
-s = xmlrpc.client.ServerProxy('http://localhost:8000')
+main = ServerThread(8000)
+s1 = ServerThread(8001)
+s2 = ServerThread(8002)
 
-#server.register_function(powerOf,'pow')
 
-# Register a function under a different name
-def adder_function(x,y):
-    return x + y
-server.register_function(adder_function, 'add')
-
-# Register an instance; all the methods of the instance are
-# published as XML-RPC methods (in this case, just 'mul').
-class MyFuncs:
-    def mul(self, x, y):
+class S1Funcs:
+    def mul(x, y):
         return x * y
+    def divide(x, y):
+        if y != 0:
+            return x / y
+        else:
+            return ZeroDivisionError
 
-server.register_instance(MyFuncs())
+s1.localServer.register_instance(S1Funcs)
+s1.start()
 
-# Run the server's main loop
-server.serve_forever()
+s2.localServer.register_function(pow)
+s2.start()
+
+c1 = xmlrpc.client.ServerProxy('http://localhost:8001')
+c2 = xmlrpc.client.ServerProxy('http://localhost:8002')
+
+
+class MainFuncs:
+
+    def add(self, x, y):
+        return x + y
+    def sub(self, x, y):
+        return x - y
+
+    # Passed on to S1
+    def divide(self, x, y):
+        return c1.divide(x, y)
+    def mul(self, x, y):
+        return c1.mul(x, y)
+
+    # Passed on to S2
+    def pow(self, x, y):
+        return c2.pow(x, y)
+
+
+main.localServer.register_instance(MainFuncs())
+main.start()

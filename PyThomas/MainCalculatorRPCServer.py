@@ -56,15 +56,12 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
 
     # Method revealed by RPC to users of the calculator.
     def calculate_expression(self, expression):
+        # Strip whitespace:
+        expression = str(expression).strip()
         print("Main server receive problem to solve: {0}".format(expression))
+        # Parse into parts left, right and operator:
         parts = self.split_expression(expression)
         if len(parts) != 3:
-            parts_print = ""
-            comma = ""
-            for part in parts:
-                parts_print += comma + part
-                comma = ", "
-            print("Split up expression: {0}".format(parts_print))
             return "Incorrect number of parts in expression, must be 3; two decimals and a valid operator."
 
         operator = parts[1]

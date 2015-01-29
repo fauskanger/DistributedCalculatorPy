@@ -1,9 +1,6 @@
 import xmlrpc.client
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-
-
-
 # Restrict to a particular path.
 from PyThomas.MainCalculatorRPCServer import MainCalculatorRPCServer
 

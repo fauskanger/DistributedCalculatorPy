@@ -1,7 +1,7 @@
 import xmlrpc.client
 import itertools
 
-from PyThomas.RPCCalculatorServer import CalculatorRPCServer
+from PyThomas.CalculatorRPCServer import CalculatorRPCServer
 
 
 class MainCalculatorRPCServer(CalculatorRPCServer):
@@ -39,10 +39,6 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
 
     @staticmethod
     def split_expression(expression):
-        # Source: http://stackoverflow.com/questions/13673781
-        # /splitting-a-string-where-it-switches-between-numeric-and-alphabetic-characters
-        # temp_parts = ["".join(x) for _, x in itertools.groupby(expression, key=str.isnumeric)]
-        # return temp_parts
         ex = str(expression)
         for operator in {"+", "-", "*", "/", "^"}:
             operator_index = ex.find(operator)
@@ -55,10 +51,10 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
                 right = float(right)
                 return [left, operator, right]
             except ValueError:
-                return "Could not parse expression into two parts."
+                return "Left: {0} or Right: {1} or both is not a number.".format(left, right)
+        return "Could not parse expression into two parts"
 
-
-
+    # Method revealed by RPC to users of the calculator.
     def calculate_expression(self, expression):
         print("Main server receive problem to solve: {0}".format(expression))
         parts = self.split_expression(expression)
@@ -74,8 +70,6 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
         operator = parts[1]
         left = parts[0]
         right = parts[2]
-
-        # print("Left: {0}  Operator: {1}  Right: {2}".format(left, operator, right))
 
         if operator in self.child_dictionary.keys():
             calc_client = self.child_dictionary[operator]

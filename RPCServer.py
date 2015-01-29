@@ -21,7 +21,7 @@ main = ServerThread(8000)
 s1 = ServerThread(8001)
 s2 = ServerThread(8002)
 
-
+# S1-functions
 class S1Funcs:
 
     def mul(self, x, y):
@@ -39,24 +39,25 @@ s1.start()
 s2.localServer.register_function(pow)
 s2.start()
 
+# Client proxies from Main to S1 and S2
 c1 = xmlrpc.client.ServerProxy('http://localhost:8001')
 c2 = xmlrpc.client.ServerProxy('http://localhost:8002')
 
-
+# Main-server functions.
 class MainFuncs:
-
+   
     def add(self, x, y):
         return x + y
     def sub(self, x, y):
         return x - y
 
-    # Pass on to S1
+    # Pass on to S1-proxy
     def divide(self, x, y):
         return c1.divide(x, y)
     def mul(self, x, y):
         return c1.mul(x, y)
 
-    # Pass on to S2
+    # Pass on to S2-proxy
     def pow(self, x, y):
         return c2.pow(x, y)
 

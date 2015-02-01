@@ -45,8 +45,3 @@ class DistributedCalculator():
     def send_problem(self, expression):
         return self.rpc_main_client.calculate_expression(str(expression))
 
-    # def close(self):
-    #     for server in self.child_server_instances:
-    #         server.server_close()
-    #     if self.server_instance.main_server_close():
-    #         print("Main server closed.")

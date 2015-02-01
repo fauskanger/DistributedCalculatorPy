@@ -24,8 +24,8 @@ def test_distributed_calc(dc):
         # print("Answer from main server (port {0}):".format(dc.port_no))
         print("Result: {0} => {1}".format(problem, result))
 
-def query_user(display_text):
-    return input(display_text)
+def query_user():
+    return input("Please enter a math problem: (Exit with 0)")
 
 #
 #   MAIN program:
@@ -40,13 +40,12 @@ def program():
     for i in range(1, 3):
         print("-"*5)
 
-    query_string = "Please enter a math problem: (Exit with 0)"
-    user_input = query_user(query_string)
+    user_input = query_user()
     while user_input != "0":
         result = dc.send_problem(user_input)
         print("Result: {0} => {1}".format(user_input, result))
         print("-"*10)
-        user_input = query_user(query_string)
+        user_input = query_user()
 
     print("Bye bye! Thanks for using awesome distributed calculator.")
 

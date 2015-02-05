@@ -1,7 +1,4 @@
 import xmlrpc.client
-import itertools
-from PyThomas.Calculator import Calculator
-
 from PyThomas.CalculatorRPCServer import CalculatorRPCServer
 
 
@@ -17,7 +14,7 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
 
         # Map operators to main server (self)
         # NB! IT SHOULD BE NOTED that self is not same type as clients,
-        # so this is checked for in calculation_evaluation.
+        # so this is checked for in self.calculate_expression.
         self.self_operators = self_operators
         self.always_override_operators = always_override_operators
         self.register_self_operators()
@@ -26,7 +23,6 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
         self.server.register_function(self.calculate_expression)
         # Create RPC-interface for child servers to register themselves
         self.server.register_function(self.register_child_server)
-        # self.server.register_function(self.main_server_close)
         print("Main server initialized.")
 
     @staticmethod
@@ -46,7 +42,7 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
                 return "Left: {0} or Right: {1} or both is not a number.".format(left, right)
         return "Could not parse expression into two parts"
 
-    # Method revealed by RPC to users of the calculator.
+    # Method revealed by RPC for user input to the calculator.
     def calculate_expression(self, expression):
         # Strip whitespace:
         expression = str(expression).strip()
@@ -71,20 +67,23 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
 
         return 'Expression is not two decimals and a valid operator:'
 
-    def register_child_server(self, child_port_no, child_operator):
-        print("Main server received registration from child server (port {0}) with operator: {1}"
-              .format(child_port_no, child_operator))
+    # Method revealed by RPC for other servers to register themselves as
+    def register_child_server(self, child_domain, child_operator):
+        if child_domain == self.port_no:
+            return False
+        print("Main server received registration from child server ({0}) with operator: {1}"
+              .format(child_domain, child_operator))
 
-        child_port_no = int(child_port_no)
+        # child_domain = int(child_domain)
 
         # Add new clients
-        if child_port_no not in self.rcp_child_clients.keys():
+        if child_domain not in self.rcp_child_clients.keys():
             # Connect as client to child RPC-server
-            self.rcp_child_clients[child_port_no] \
-                = xmlrpc.client.ServerProxy('http://localhost:' + str(child_port_no))
+            self.rcp_child_clients[child_domain] \
+                = xmlrpc.client.ServerProxy(str(child_domain))
 
         # Map operator to server
-        self.calculator_client_dictionary[child_operator] = self.rcp_child_clients[child_port_no]
+        self.calculator_client_dictionary[child_operator] = self.rcp_child_clients[child_domain]
 
         # Some clients may have registered with same operators
         if self.always_override_operators:
@@ -94,14 +93,8 @@ class MainCalculatorRPCServer(CalculatorRPCServer):
     def say_hello(self):
         return "{0}, here. Hello!".format(self.port_no)
 
-    # Used to overwrite any other servers.
+    # Used to overwrite any other servers' operators
+    # if overlapping with self.self_operators.
     def register_self_operators(self):
         for operator in self.self_operators:
             self.calculator_client_dictionary[operator] = self
-
-    # def main_server_close(self):
-    #     for server_key in self.rcp_child_clients.keys():
-    #         port = self.rcp_child_clients[server_key].get_port_no()
-    #         if not self.rcp_child_clients[server_key].server_close():
-    #             print("Remotely closed server on port {0} from main server.".format(port))
-    #     return self.server.server_close()

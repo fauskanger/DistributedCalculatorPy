@@ -1,3 +1,6 @@
+from math import gamma
+from math import factorial
+
 class Calculator:
     def __init__(self):
         self.maths = {
@@ -5,7 +8,8 @@ class Calculator:
             '-': self.subtract,
             '*': self.multiply,
             '/': self.divide,
-            '^': self.power
+            '^': self.power,
+            '!': self.factorial
         }
 
     @staticmethod
@@ -21,9 +25,9 @@ class Calculator:
         return x * y
 
     @staticmethod
-    def divide(x, y):
-        if y != 0:
-            return x / y
+    def divide(numerator, denominator):
+        if denominator != 0:
+            return numerator / denominator
         else:
             # raise ZeroDivisionError
             return "Cannot divide by Zero!"
@@ -32,6 +36,15 @@ class Calculator:
     def power(base, power):
         return pow(base, power)
 
+    @staticmethod
+    def factorial(x):
+        if int(x) == x:
+            return factorial(x)
+        else:
+            return gamma(x)
+
     def calculate(self, x, y, operator):
         if operator in self.maths:
             return self.maths[operator](float(x), float(y))
+        else:
+            return "Cannot compute. {0} is not recognized as operator or symbol.".format(operator)

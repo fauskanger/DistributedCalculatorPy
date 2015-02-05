@@ -1,4 +1,3 @@
-import sys
 from PyThomas.DistributedCalculatorServer import DistributedCalculator
 
 
@@ -23,6 +22,7 @@ def test_distributed_calc(dc):
         result = dc.send_problem(problem)
         # print("Answer from main server (port {0}):".format(dc.port_no))
         print("Result: {0} => {1}".format(problem, result))
+
 
 def query_user():
     return input("Please enter a math problem: (Exit with 0)")
@@ -49,7 +49,6 @@ def program():
 
     print("Bye bye! Thanks for using awesome distributed calculator.")
 
-    # dc.close()
 
 #
 #   Start script:

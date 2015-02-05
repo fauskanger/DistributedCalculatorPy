@@ -36,10 +36,7 @@ class CalculatorRPCServer:
         self.server.register_function(self.get_port, 'get_port_no')
 
         # Connect to main server as RPC-client, so later as a RPC-CalculatorServer
-        self.main_server_
-
-
-        url = main_server_url
+        self.main_server_url = main_server_url
         self.rpc_main_client = xmlrpc.client.ServerProxy(self.main_server_url)
 
         # Because starting a server blocks the program, it's done in a separate thread
